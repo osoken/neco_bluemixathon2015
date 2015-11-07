@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<link rel='stylesheet' href='/javascripts/vendor/leaflet/leaflet.css' />
+
+<script src="/javascripts/vendor/leaflet/leaflet.js"></script>
+
+<script src="/javascripts/vendor/d3.min.js"></script>
+
+<script src="/javascripts/map.js"></script>
+<style>
+html{height:100%;}
+body{height:100%;}
+</style>
+
+<body style='padding:0;'>
+<div id='map' style='margin:0;padding:0;width:100%;'></div>
+<div id='detail' style='margin:0;padding:0;width:100%;overflow-x:slide;overflow-y:hidden;'>
+  <ul style='list-style:none;margin:0;padding:0;'>
+  </ul>
+</div>
+<script>
+map.init(d3.select('div#map'));
+</script>
