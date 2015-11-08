@@ -77,7 +77,21 @@
           .text(function(d){return d.timestamp;});
 
         plotLayer2.selectAll('rect.frame')
-          .attr('fill', function(d){return (idTagMap[d._id].some(function(d){return d=='person'||d=='cat';}))?'rgba(255,255,0,1.0)':'rgba(0,0,0,0)';})
+          .attr('fill',
+            function(d)
+            {
+              return idTagMap[d._id].some(
+                function(dd)
+                {
+                  return ['person','cat','dog'].some(
+                    function(ddd)
+                    {
+                      return dd == ddd;
+                    });
+                }
+              )?'rgba(255,255,0,1.0)':'rgba(0,0,0,0)';
+            }
+          )
           .attr('height', bigH*1.1).attr('width', bigW*1.1).attr('x',-(bigW*1.1*0.5)).attr('y',-(bigH*1.1*0.5));
         plotLayer2.selectAll('image')
           .attr('height', bigH).attr('width',bigW).attr('x',-0.5*bigW).attr('y',-0.5*bigH);
@@ -92,13 +106,16 @@
           .attr('x', -0.5*bigW).attr('font-size', 0.1*bigH).attr('fill','#FFF').attr('y',bigH*(0.5-0.0));
         d3.select('div#detail ul').style('width',(128*dat.length)+'px').selectAll('li')
           .data(dat).enter().append('li')
-          .style('width',smallW+'px').style('height',smallH+'px').style('margin','0').style('padding','0').style('float','left')
+          .style('width',smallW+'px').style('height',smallH+'px')
+          .style('margin','0').style('padding','0').style('border',function(d){return })
+          .style('float','left')
           .append('img').attr('src', function(d){return (d.image.startsWith('data'))?d.image:'data:image/png;base64,'+d.image;})
           .style('width',smallW+'px').style('height',smallH+'px').style('margin','0').style('padding','0')
           .on('mouseover', function(d)
           {
             var focusId = d._id;
             plotLayer2.selectAll('g').attr('visibility',function(d){return (d._id==focusId)?'visible':'hidden';});
+            mapLayer.setView(d.loc);
           });
         setTimeout(draw, 1000);
       });

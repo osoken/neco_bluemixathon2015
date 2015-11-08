@@ -40,7 +40,7 @@ router.get('/api/tags', function(req, res, next)
 router.get('/api/image', function(req, res, next)
 {
 //  imageModel.find({},'-image', function(err,dat)
-  imageModel.find({}, function(err,dat)
+  imageModel.find({},{},{sort:{timestamp: -1},limit:20}, function(err,dat)
   {
     res.json(dat);
   });
@@ -57,8 +57,6 @@ router.post('/api/image', function(req, res, next)
   }
   query.loc = [+query.lon, +query.lat];
   query.timestamp = new Date();
-
-  query.tag = [];
 
   new imageModel(query).save(function(err,data)
   {

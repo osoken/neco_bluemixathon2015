@@ -15,7 +15,7 @@ var schema = new mongoose.Schema(
   image: { type: String, index: false},
   loc: { type: [Number], index: '2dsphere'},
   timestamp: {type: Date, default: Date.now},
-  tags: { type: [String] }
+  tags: { type: [String], default:['analyzing...'] }
 },{collection: 'imageDemo'});
 
 module.exports = db.model('imageDemo', schema);
