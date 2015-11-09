@@ -1,7 +1,9 @@
 var mongoose = require('mongoose');
 var uuid = require('node-uuid');
 var config = require('../config');
+
 var db = mongoose.createConnection('mongodb://'+config.dbUser+':'+config.dbPassword+'@'+config.dbHost+':'+config.dbPort+'/'+config.dbName , function(err, res)
+//var db = mongoose.createConnection('mongodb://localhost:27017/db', function(err, res)
 {
   if (err)
   {

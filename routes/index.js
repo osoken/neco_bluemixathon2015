@@ -8,6 +8,11 @@ var querystring = require('querystring');
 
 var config = require('../config');
 
+router.get('/', function(req,res,next)
+{
+  res.render('index', { title: 'NECO' });
+});
+
 router.get('/api/image/:imageid([a-fA-F0-9]{8}[a-fA-F0-9]{4}[0-5][a-fA-F0-9]{3}[089aAbB][a-fA-F0-9]{3}[a-fA-F0-9]{12})', function(req,res,next)
 {
   imageModel.findOne({'_id':req.params.imageid}, function(err,dat)
@@ -40,7 +45,7 @@ router.get('/api/tags', function(req, res, next)
 router.get('/api/image', function(req, res, next)
 {
 //  imageModel.find({},'-image', function(err,dat)
-  imageModel.find({},{},{sort:{timestamp: -1},limit:20}, function(err,dat)
+  imageModel.find({},{},{sort:{timestamp: -1},limit:40}, function(err,dat)
   {
     res.json(dat);
   });

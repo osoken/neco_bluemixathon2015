@@ -1,4 +1,4 @@
-!(function(d3,L)
+!(function(d3,L,Ps)
 {
   var map = {};
   var tracking = true;
@@ -19,7 +19,7 @@
   map.init = function(root)
   {
     selection = root;
-    selection.style('height', (d3.select('html').node().getBoundingClientRect().height-120)+'px');
+    selection.style('height', (d3.select('html').node().getBoundingClientRect().height-12-smallH)+'px');
     var point = [35.730854409187884, 139.7169756889343];
     var focus = {original: new L.LatLng( 35.68036, 139.76798)};
     mapLayer = L.map(selection.attr('id')).setView(point, zoom);
@@ -28,19 +28,25 @@
       attribution : '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(mapLayer);
 
+    Ps.initialize(d3.select('div#list').node());
     svgLayer = d3.select(mapLayer.getPanes().overlayPane).append("svg")
       .on('mouseover', function(d)
-              {
-                plotLayer2.selectAll('g').attr('visibility','hidden');
-              });
+      {
+        plotLayer2.selectAll('g').attr('visibility','hidden');
+      });
     plotLayer = svgLayer.append('g').attr('class', 'leaflet-zoom-hide');
     plotLayer2 = svgLayer.append('g').attr('class', 'leaflet-zoom-hide');
+    logoLayer = svgLayer.append('g').attr('class', 'leaflet-zoom-hide');
+    logoLayer.append('image').attr('xlink:href', 'images/neco.png')
+      .attr('width',94).attr('height',45).attr('x',60).attr('y',10);
 
     var draw = function()
     {
       d3.json('/api/image', function(err,dat)
+//      d3.json('image.json', function(err,dat)
       {
-        dat.forEach(function(d,i){
+        dat.forEach(function(d,i)
+        {
           d.loc = d.loc || [139.767981 + 0.1*i,35.680361];
           var tmp = d.loc[1];
           d.loc[1] = d.loc[0];
@@ -48,7 +54,13 @@
           d.pos = projectPoint(d.loc);
           d.tag = d.tag || [];
           d.image = d.image || '';
-          idTagMap[d._id] = d.tags;
+          d.emph = d.tags.some(function(dd)
+          {
+            return ['person','cat','dog'].some(function(ddd)
+            {
+              return dd==ddd;
+            });
+          });
         });
         var g = plotLayer.selectAll('g')
           .data(dat).enter().append('g')
@@ -58,7 +70,7 @@
         g.append('image').attr('xlink:href', function(d){return (d.image.startsWith('data'))?d.image:'data:image/png;base64,'+d.image;});
 
         plotLayer.selectAll('rect.frame')
-          .attr('fill', function(d){return (idTagMap[d._id].some(function(d){return d=='person'||d=='cat';}))?'rgba(255,255,0,1.0)':'rgba(0,0,0,0)';})
+          .attr('fill', function(d){return d.emph?'rgba(255,255,0,1.0)':'rgba(0,0,0,0)';})
           .attr('height', smallH*1.1).attr('width', smallW*1.1).attr('x',-(smallW*1.1*0.5)).attr('y',-(smallH*1.1*0.5));
         plotLayer.selectAll('image')
           .attr('height', smallH).attr('width',smallW).attr('x',-0.5*smallW).attr('y',-0.5*smallH);
@@ -77,37 +89,24 @@
           .text(function(d){return d.timestamp;});
 
         plotLayer2.selectAll('rect.frame')
-          .attr('fill',
-            function(d)
-            {
-              return idTagMap[d._id].some(
-                function(dd)
-                {
-                  return ['person','cat','dog'].some(
-                    function(ddd)
-                    {
-                      return dd == ddd;
-                    });
-                }
-              )?'rgba(255,255,0,1.0)':'rgba(0,0,0,0)';
-            }
-          )
+          .attr('fill', function(d){return d.emph?'rgba(255,255,0,1.0)':'rgba(0,0,0,0)';})
           .attr('height', bigH*1.1).attr('width', bigW*1.1).attr('x',-(bigW*1.1*0.5)).attr('y',-(bigH*1.1*0.5));
         plotLayer2.selectAll('image')
           .attr('height', bigH).attr('width',bigW).attr('x',-0.5*bigW).attr('y',-0.5*bigH);
         plotLayer2.selectAll('rect.textbg')
           .attr('height', 0.3*bigH).attr('width',bigW).attr('x',-0.5*bigW).attr('y',bigH*(0.5-0.3)).attr('fill','rgba(0,0,0,0.8)');
         plotLayer2.selectAll('text.tag')
-          .text(function(d){return idTagMap[d._id].join(' ');})
+          .text(function(d){return d.tags.join(' ');})
           .attr('x', -0.5*bigW).attr('font-size', 0.1*bigH).attr('fill','#FFF').attr('y',bigH*(0.5-0.2));
         plotLayer2.selectAll('text.loc')
           .attr('x', -0.5*bigW).attr('font-size', 0.1*bigH).attr('fill','#FFF').attr('y',bigH*(0.5-0.1));
         plotLayer2.selectAll('text.time')
           .attr('x', -0.5*bigW).attr('font-size', 0.1*bigH).attr('fill','#FFF').attr('y',bigH*(0.5-0.0));
-        d3.select('div#detail ul').style('width',(128*dat.length)+'px').selectAll('li')
+
+        d3.select('div#list ul').style('width',((smallW+8)*dat.length)+'px').selectAll('li')
           .data(dat).enter().append('li')
-          .style('width',smallW+'px').style('height',smallH+'px')
-          .style('margin','0').style('padding','0').style('border',function(d){return })
+          .style('margin','0').style('padding','0')
+          .style('border', function(d){return d.emph?'4px solid rgba(255,255,0,1.0)':'4px solid rgba(0,0,0,0)';})
           .style('float','left')
           .append('img').attr('src', function(d){return (d.image.startsWith('data'))?d.image:'data:image/png;base64,'+d.image;})
           .style('width',smallW+'px').style('height',smallH+'px').style('margin','0').style('padding','0')
@@ -117,7 +116,7 @@
             plotLayer2.selectAll('g').attr('visibility',function(d){return (d._id==focusId)?'visible':'hidden';});
             mapLayer.setView(d.loc);
           });
-        setTimeout(draw, 1000);
+        setTimeout(draw, 2000);
       });
     };
     draw();
@@ -170,4 +169,4 @@
   }
 
   this.map = map;
-}(d3,L));
+}(d3,L,Ps));
