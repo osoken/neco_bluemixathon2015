@@ -1,20 +1,14 @@
 !(function(d3,L,Ps)
 {
   var map = {};
-  var tracking = true;
-  var zoom = 18;
   var mapLayer = null;
   var svgLayer = null;
   var plotLayer = null;
-  var menuLayer = null;
   var selection = null;
-  var idTagMap = {};
-  var imageData = [];
   var smallW = 128;
   var smallH = 96;
   var bigW = 640;
   var bigH = 480;
-  var timeFormat = d3.time.format('%Y/%m/%d %H:%M:%S');
 
   map.init = function(root)
   {
@@ -22,7 +16,7 @@
     selection.style('height', (d3.select('html').node().getBoundingClientRect().height-12-smallH)+'px');
     var point = [35.730854409187884, 139.7169756889343];
     var focus = {original: new L.LatLng( 35.68036, 139.76798)};
-    mapLayer = L.map(selection.attr('id')).setView(point, zoom);
+    mapLayer = L.map(selection.attr('id')).setView(point, 18);
 
     var tileLayer = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
       attribution : '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
@@ -43,7 +37,6 @@
     var draw = function()
     {
       d3.json('/api/image', function(err,dat)
-//      d3.json('image.json', function(err,dat)
       {
         dat.forEach(function(d,i)
         {
@@ -116,6 +109,7 @@
             plotLayer2.selectAll('g').attr('visibility',function(d){return (d._id==focusId)?'visible':'hidden';});
             mapLayer.setView(d.loc);
           });
+        Ps.update(d3.select('div#list').node());
         setTimeout(draw, 2000);
       });
     };

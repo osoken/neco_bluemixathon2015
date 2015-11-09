@@ -1,14 +1,25 @@
-# Node.js Starter Overview
+# NECO server
 
-The Node.js Starter demonstrates a simple, reusable Node.js web application based on the Express framework.
+This is the server-side application of the [NECO project](http://devpost.com/software/neco).
+This project is for [Bluemixathon: Operation Rescure & Recovery](http://bluemixathon.devpost.com/).
 
-## Run the app locally
+## REST API
 
-1. [Install Node.js][]
-2. Download and extract the starter code from the Bluemix UI
-3. cd into the app directory
-4. Run `npm install` to install the app's dependencies
-5. Run `npm start` to start the app
-6. Access the running app in a browser at http://localhost:6001
+|Method|Route|Description|
+|---|---|---|
+|`GET`|`/api/image`|get the recent images with tags and location in json|
+|`POST`|`/api/image`|post a new image to the server. Request body must contain `lon`(longitude), `lat`(latitude) and `image`(base 64 encoded image)|
+|`GET`|`/api/image/<id>`|get image as jpeg|
 
-[Install Node.js]: https://nodejs.org/en/download/
+## Configuration
+
+You must place `config.json` file in the application's root directory to run the application on a server.
+`config.json` consists of an object with the following attributes:
+
+- "dbUser": username for the Mongo DB instance.
+- "dbPassword": password for the Mongo DB instance.
+- "dbHost": address for the Mongo DB instance.
+- "dbPort": port for the Mongo DB instance.
+- "dbName": name of the database in Mongo DB.
+- "selfHostAddress": host name.
+- "alchemyAPIKey": Alchemy API key.
